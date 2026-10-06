@@ -147,6 +147,36 @@ public partial class SolutionGeneratorTests
         Assert.DoesNotContain(fullPlan.Files, file => file.FileName == ".gitkeep");
     }
 
+    /// <summary>
+    /// Visual Studio ilk projeyi başlangıç projesi yapar; sınıf kitaplığı ilk sırada olursa F5
+    /// "Çıkış türü sınıf kitaplığı olan bir proje doğrudan başlatılamaz" hatası verir.
+    /// </summary>
+    [Theory]
+    [InlineData(true, true, SolutionFormat.Sln, "WebAPI")]
+    [InlineData(true, false, SolutionFormat.Sln, "WebAPI")]
+    [InlineData(false, true, SolutionFormat.Sln, "WebUI")]
+    [InlineData(true, true, SolutionFormat.Slnx, "WebAPI")]
+    [InlineData(false, true, SolutionFormat.Slnx, "WebUI")]
+    public void CreatePlan_SolutionFile_ListsWebProjectFirst(bool webApi, bool webUi, SolutionFormat format, string expectedLayer)
+    {
+        var plan = _generator.CreatePlan(new GeneratorOptions
+        {
+            SolutionName = SolutionName,
+            OutputDirectory = Path.GetTempPath(),
+            IncludeWebApi = webApi,
+            IncludeWebUi = webUi,
+            SolutionFormat = format
+        });
+
+        var solution = plan.FindFile(plan.SolutionFileName)!.Content;
+        var firstProjectLine = solution.Split("\r\n").First(line =>
+            format == SolutionFormat.Sln
+                ? line.StartsWith("Project(", StringComparison.Ordinal)
+                : line.TrimStart().StartsWith("<Project ", StringComparison.Ordinal));
+
+        Assert.Contains($"{SolutionName}.{expectedLayer}.csproj", firstProjectLine);
+    }
+
     [Fact]
     public void CreatePlan_SameOptions_IsDeterministic()
     {

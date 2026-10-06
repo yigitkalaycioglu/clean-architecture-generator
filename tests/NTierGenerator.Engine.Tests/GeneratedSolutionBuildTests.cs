@@ -49,7 +49,7 @@ public class GeneratedSolutionBuildTests(ITestOutputHelper output)
             if (tests)
             {
                 var exitCode = await ProcessRunner.RunAsync(
-                    "dotnet", ["test", result.SolutionFilePath, "--no-build", "--nologo"], result.SolutionDirectory, output.WriteLine);
+                    "dotnet", ["test", result.SolutionFilePath, "--no-build", "--nologo", "--disable-build-servers"], result.SolutionDirectory, output.WriteLine);
                 Assert.Equal(0, exitCode);
             }
         }

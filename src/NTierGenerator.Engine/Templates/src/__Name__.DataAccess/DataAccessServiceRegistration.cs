@@ -2,6 +2,7 @@ using __Name__.DataAccess.Concrete.EntityFramework.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace __Name__.DataAccess;
 
@@ -32,17 +33,33 @@ public static class DataAccessServiceRegistration
 
     /// <summary>
     /// Bekleyen EF Core migration'larını veritabanına uygular; veritabanı yoksa oluşturur.
-    /// Geliştirme ortamında uygulama açılırken çağrılır.
+    /// Geliştirme ortamında uygulama açılırken çağrılır. Henüz hiç migration yoksa veritabanına bağlanılmaz;
+    /// veritabanına ulaşılamazsa uygulama kapanmaz, nedeni loglanır.
     /// </summary>
     public static async Task ApplyDatabaseMigrationsAsync(this IServiceProvider serviceProvider, CancellationToken cancellationToken = default)
     {
         await using var scope = serviceProvider.CreateAsyncScope();
         var context = scope.ServiceProvider.GetRequiredService<__ContextName__>();
 
-        var pendingMigrations = await context.Database.GetPendingMigrationsAsync(cancellationToken);
-        if (pendingMigrations.Any())
+        // İlk migration eklenene kadar yapılacak bir şey yok (GetMigrations veritabanına bağlanmaz).
+        if (!context.Database.GetMigrations().Any())
         {
-            await context.Database.MigrateAsync(cancellationToken);
+            return;
+        }
+
+        try
+        {
+            var pendingMigrations = await context.Database.GetPendingMigrationsAsync(cancellationToken);
+            if (pendingMigrations.Any())
+            {
+                await context.Database.MigrateAsync(cancellationToken);
+            }
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger(typeof(DataAccessServiceRegistration));
+            logger.LogError(exception,
+                "Migration'lar uygulanamadı. 'ConnectionStrings:DefaultConnection' ayarını ve veritabanı sunucusunun çalıştığını kontrol edin.");
         }
     }
 }

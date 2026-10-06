@@ -33,7 +33,9 @@ public static class ProcessRunner
         startInfo.Environment["DOTNET_NOLOGO"] = "1";
         startInfo.Environment["DOTNET_SKIP_FIRST_TIME_EXPERIENCE"] = "1";
 
-        using var process = new Process { StartInfo = startInfo };
+        using var process = new Process { StartInfo = startInfo, EnableRaisingEvents = true };
+        var exited = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        process.Exited += (_, _) => exited.TrySetResult();
         process.OutputDataReceived += (_, e) => Forward(e.Data);
         process.ErrorDataReceived += (_, e) => Forward(e.Data);
 
@@ -52,12 +54,23 @@ public static class ProcessRunner
 
         try
         {
-            await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
+            await exited.Task.WaitAsync(cancellationToken).ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {
             process.Kill(entireProcessTree: true);
             throw;
+        }
+
+        // Kalan çıktı satırları için kısa bir süre beklenir. Süreç arka planda başka süreçler başlattıysa
+        // (ör. kalıcı MSBuild düğümleri) bunlar çıktı borusunu açık tutabilir; bu yüzden süresiz beklenmez.
+        using var drainTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+        try
+        {
+            await process.WaitForExitAsync(drainTimeout.Token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
         }
 
         return process.ExitCode;
@@ -89,9 +102,11 @@ public static class PostGenerationActions
 
     public static async Task<bool> BuildSolutionAsync(string solutionFilePath, Action<string>? onOutput = null, CancellationToken cancellationToken = default)
     {
+        // --disable-build-servers: derleme bitince arkada MSBuild/derleyici süreci kalmaz; bunlar hem çıktı
+        // borusunu açık tutar hem de üretilen klasördeki dosyaları kilitleyebilir.
         var exitCode = await ProcessRunner.RunAsync(
             "dotnet",
-            ["build", solutionFilePath, "--nologo", "-v", "minimal"],
+            ["build", solutionFilePath, "--nologo", "-v", "minimal", "--disable-build-servers"],
             Path.GetDirectoryName(solutionFilePath)!,
             onOutput,
             cancellationToken).ConfigureAwait(false);

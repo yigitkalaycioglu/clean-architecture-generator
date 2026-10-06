@@ -15,10 +15,22 @@ internal static class SolutionFileWriter
 
     private static readonly string[] Configurations = ["Debug|Any CPU", "Release|Any CPU"];
 
-    public static string Write(SolutionFormat format, string solutionName, IReadOnlyList<PlannedProject> projects, IReadOnlyList<string> solutionItems) =>
-        format == SolutionFormat.Slnx
-            ? WriteSlnx(projects, solutionItems)
-            : WriteSln(solutionName, projects, solutionItems);
+    /// <param name="startupProject">
+    /// Visual Studio, kullanıcı ayarı (.vs klasörü) yokken çözüm dosyasındaki ilk projeyi başlangıç projesi yapar.
+    /// Bu proje en başa yazılır; böylece çözüm ilk açıldığında F5 bir sınıf kitaplığını değil, web projesini çalıştırır.
+    /// </param>
+    public static string Write(
+        SolutionFormat format,
+        string solutionName,
+        IReadOnlyList<PlannedProject> projects,
+        IReadOnlyList<string> solutionItems,
+        PlannedProject startupProject)
+    {
+        List<PlannedProject> orderedProjects = [startupProject, .. projects.Where(project => project != startupProject)];
+        return format == SolutionFormat.Slnx
+            ? WriteSlnx(orderedProjects, solutionItems)
+            : WriteSln(solutionName, orderedProjects, solutionItems);
+    }
 
     private static string WriteSln(string solutionName, IReadOnlyList<PlannedProject> projects, IReadOnlyList<string> solutionItems)
     {
@@ -28,6 +40,14 @@ internal static class SolutionFileWriter
         builder.AppendLine("# Visual Studio Version 17");
         builder.AppendLine("VisualStudioVersion = 17.0.31903.59");
         builder.AppendLine("MinimumVisualStudioVersion = 10.0.40219.1");
+
+        // Projeler sanal klasörlerden önce yazılır: dosyadaki ilk Project girdisi başlangıç projesi olur.
+        var projectGuids = projects.ToDictionary(project => project, project => CreateGuid(solutionName, project.RelativePath));
+        foreach (var project in projects)
+        {
+            builder.AppendLine($"Project(\"{CSharpProjectTypeGuid}\") = \"{project.Name}\", \"{project.RelativePath.Replace('/', '\\')}\", \"{projectGuids[project]}\"");
+            builder.AppendLine("EndProject");
+        }
 
         var folderGuids = projects
             .Select(project => project.SolutionFolder)
@@ -52,13 +72,6 @@ internal static class SolutionFileWriter
             }
 
             builder.AppendLine("\tEndProjectSection");
-            builder.AppendLine("EndProject");
-        }
-
-        var projectGuids = projects.ToDictionary(project => project, project => CreateGuid(solutionName, project.RelativePath));
-        foreach (var project in projects)
-        {
-            builder.AppendLine($"Project(\"{CSharpProjectTypeGuid}\") = \"{project.Name}\", \"{project.RelativePath.Replace('/', '\\')}\", \"{projectGuids[project]}\"");
             builder.AppendLine("EndProject");
         }
 

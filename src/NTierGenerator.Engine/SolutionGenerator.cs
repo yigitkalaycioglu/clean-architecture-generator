@@ -73,8 +73,11 @@ public sealed class SolutionGenerator(ITemplateSource templateSource)
         var solutionItems = SolutionItemCandidates
             .Where(item => files.Any(file => file.RelativePath == item))
             .ToList();
+        var startupProject = projects.Single(project => project.Layer == context.Tokens["StartupProject"]);
         var solutionFileName = context.Tokens["SolutionFile"];
-        files.Add(new PlannedFile(solutionFileName, SolutionFileWriter.Write(options.SolutionFormat, options.SolutionName, projects, solutionItems)));
+        files.Add(new PlannedFile(
+            solutionFileName,
+            SolutionFileWriter.Write(options.SolutionFormat, options.SolutionName, projects, solutionItems, startupProject)));
 
         files.Sort((left, right) => StringComparer.OrdinalIgnoreCase.Compare(left.RelativePath, right.RelativePath));
         InsertFolderTree(files, options.SolutionName);

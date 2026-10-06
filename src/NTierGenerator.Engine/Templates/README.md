@@ -63,8 +63,12 @@ dotnet run --project src/__Name__.__StartupProject__
 ```
 
 Uygulama Development ortamında açılırken bekleyen migration'ları uygular; veritabanı yoksa oluşturur.
-Visual Studio kullanıyorsanız Package Manager Console'da *Default project* olarak `__Name__.DataAccess`,
-başlangıç projesi olarak `__Name__.__StartupProject__` seçiliyken `Add-Migration InitialCreate` yazmanız yeterli.
+Henüz migration yoksa veritabanına bağlanmaz, yani çözüm ilk açıldığında da çalışır; veritabanı kullanan
+uç noktalar ilk migration'dan sonra çalışır.
+
+Visual Studio'da çözüm açıldığında başlangıç projesi `__Name__.__StartupProject__` olarak gelir, F5 yeterli.
+Migration'ı Package Manager Console'dan eklemek için *Default project* olarak `__Name__.DataAccess` seçip
+`Add-Migration InitialCreate` yazın.
 
 <!--#if WebApi-->
 - Swagger UI: http://localhost:__ApiHttpPort__/swagger
