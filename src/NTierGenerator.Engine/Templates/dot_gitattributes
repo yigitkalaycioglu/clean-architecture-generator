@@ -1,0 +1,16 @@
+# Satır sonları depoda normalize edilir
+* text=auto
+
+*.cs     text diff=csharp
+*.cshtml text diff=html
+*.csproj text
+*.props  text
+*.json   text
+*.md     text
+*.sln    text eol=crlf
+*.slnx   text
+
+*.png binary
+*.jpg binary
+*.ico binary
+*.db  binary

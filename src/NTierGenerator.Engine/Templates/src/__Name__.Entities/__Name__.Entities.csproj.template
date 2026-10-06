@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Entities: veritabanı tablolarına karşılık gelen varlıklar (Concrete) ve veri taşıma nesneleri (DTOs). -->
+  <ItemGroup>
+    <ProjectReference Include="..\__Name__.Core\__Name__.Core.csproj" />
+  </ItemGroup>
+
+</Project>
