@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Application: kullanım senaryoları (komutlar ve sorgular), doğrulama kuralları ve dış dünyaya açılan arayüzler
+    (veritabanı, kimlik, e-posta). Yalnızca Domain'e bağımlıdır; arayüzlerin uygulamaları Infrastructure'dadır.
+    EF Core'un yalnızca soyutlamaları (DbSet, LINQ) kullanılır; veritabanı sağlayıcısı burada yoktur.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\__Name__.Domain\__Name__.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="__Name__.UnitTests" />
+  </ItemGroup>
+
+</Project>

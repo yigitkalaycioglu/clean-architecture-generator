@@ -1,0 +1,68 @@
+# Visual Studio ve VS Code (REST Client) ile istek göndermek için örnekler.
+# Önce uygulamayı "https" profiliyle çalıştırın.
+@baseUrl = https://localhost:__ApiHttpsPort__
+//#if LocalAuth
+# Giriş yaptıktan sonra yanıttaki accessToken değerini buraya yapıştırın.
+//#else
+# Kimlik sağlayıcınızdan bu API için aldığınız erişim token'ını buraya yapıştırın.
+//#endif
+@accessToken = <token>
+
+### Sağlık kontrolü (anonim)
+GET {{baseUrl}}/health/live
+//#if LocalAuth
+
+### Kayıt: doğrulama bağlantısı Development'ta konsol loguna yazılır
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "ornek@ornek.com",
+  "password": "uzun-ve-tahmin-edilemez-bir-parola"
+}
+
+### E-posta doğrulama (logdaki bağlantıdaki userId ve code değerleri)
+POST {{baseUrl}}/api/auth/confirm-email
+Content-Type: application/json
+
+{
+  "userId": "<userId>",
+  "code": "<code>"
+}
+
+### Giriş: erişim token'ı gövdede, yenileme token'ı HttpOnly çerezde döner
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "ornek@ornek.com",
+  "password": "uzun-ve-tahmin-edilemez-bir-parola"
+}
+
+### Erişim token'ını yenile (çerezdeki yenileme token'ıyla)
+POST {{baseUrl}}/api/auth/refresh
+
+### Çıkış
+POST {{baseUrl}}/api/auth/logout
+//#endif
+
+### Hesap bilgileri
+GET {{baseUrl}}/api/account
+Authorization: Bearer {{accessToken}}
+//#if Sample
+
+### Yapılacak işler (sayfalı)
+GET {{baseUrl}}/api/todo-items?page=1&pageSize=20
+Authorization: Bearer {{accessToken}}
+
+### Yeni iş
+POST {{baseUrl}}/api/todo-items
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Clean Architecture'ı incele",
+  "note": "Domain -> Application -> Infrastructure -> Api",
+  "priority": "High"
+}
+//#endif

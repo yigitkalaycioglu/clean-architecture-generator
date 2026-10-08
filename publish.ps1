@@ -1,4 +1,4 @@
-# Tek dosyalık exe üretir: publish\NTierGenerator.exe
+# Tek dosyalık exe üretir: publish\CleanArchitectureGenerator.exe
 #   .\publish.ps1                 .NET 10 Desktop Runtime gerektirir (.NET 10 SDK ile gelir), ~1 MB
 #   .\publish.ps1 -SelfContained  .NET kurulu olmayan bilgisayarlar için, runtime exe'nin içinde
 param([switch]$SelfContained)
@@ -7,7 +7,7 @@ $ErrorActionPreference = 'Stop'
 Set-Location $PSScriptRoot
 
 $publishArguments = @(
-    'publish', 'src/NTierGenerator.App/NTierGenerator.App.csproj',
+    'publish', 'src/CleanArchitectureGenerator.App/CleanArchitectureGenerator.App.csproj',
     '-c', 'Release',
     '-r', 'win-x64',
     '-o', 'publish',
@@ -24,4 +24,4 @@ if ($SelfContained) {
 dotnet @publishArguments
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-Get-Item publish\NTierGenerator.exe | Select-Object Name, @{ Name = 'Boyut (KB)'; Expression = { [math]::Round($_.Length / 1KB) } }
+Get-Item publish\CleanArchitectureGenerator.exe | Select-Object Name, @{ Name = 'Boyut (KB)'; Expression = { [math]::Round($_.Length / 1KB) } }

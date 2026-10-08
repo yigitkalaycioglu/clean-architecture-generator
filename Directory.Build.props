@@ -4,11 +4,11 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
-    <Version>1.0.1</Version>
+    <Version>2.0.0</Version>
     <Authors>Yiğit Kalaycıoğlu</Authors>
-    <Product>N-Tier Mimari Oluşturucu</Product>
+    <Product>Clean Architecture Oluşturucu</Product>
     <Copyright>© 2026 Yiğit Kalaycıoğlu</Copyright>
-    <RepositoryUrl>https://github.com/yigitkalaycioglu/ntier-generator</RepositoryUrl>
+    <RepositoryUrl>https://github.com/yigitkalaycioglu/clean-architecture-generator</RepositoryUrl>
   </PropertyGroup>
 
 </Project>

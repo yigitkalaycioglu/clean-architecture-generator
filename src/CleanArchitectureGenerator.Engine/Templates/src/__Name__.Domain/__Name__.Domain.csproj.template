@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Domain: varlıkların ve iş kurallarının bulunduğu çekirdek. Hiçbir projeye ve NuGet paketine bağımlı değildir;
+    veritabanını, web'i ya da kullanılan çerçeveleri bilmez. Bu kural ArchitectureTests ile denetlenir.
+  -->
+
+</Project>

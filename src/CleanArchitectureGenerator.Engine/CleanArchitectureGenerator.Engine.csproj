@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <!--
+    Templates klasörü üretilecek çözümün birebir kopyasıdır. Bu dosyalar derlenmez;
+    klasör yolları korunarak gömülü kaynak (embedded resource) olarak DLL'e eklenir.
+    Bir IDE şablon projelerini açıp derlerse oluşan bin/obj klasörleri dışarıda bırakılır.
+  -->
+  <ItemGroup>
+    <Compile Remove="Templates\**" />
+    <None Remove="Templates\**" />
+    <Content Remove="Templates\**" />
+    <EmbeddedResource Remove="Templates\**" />
+    <EmbeddedResource Include="Templates\**\*"
+                      Exclude="Templates\**\bin\**;Templates\**\obj\**"
+                      LogicalName="Templates/%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="CleanArchitectureGenerator.Engine.Tests" />
+  </ItemGroup>
+
+</Project>

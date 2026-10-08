@@ -1,0 +1,39 @@
+<Project>
+
+  <!-- Çözümdeki tüm projelerin ortak ayarları. Hedef .NET sürümü buradan tek yerden değiştirilir. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <Company>__Name__</Company>
+    <Product>__Name__</Product>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+
+  <!--
+    Kod analizi: .NET analizörlerinin tüm güvenlik kuralları (CA2xxx, CA3xxx, CA5xxx) uyarı olarak açılır ve
+    .editorconfig'deki stil kuralları derlemede denetlenir. Release derlemesinde her uyarı hata sayılır.
+  -->
+  <PropertyGroup>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <AnalysisModeSecurity>All</AnalysisModeSecurity>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <TreatWarningsAsErrors Condition="'$(Configuration)' == 'Release'">true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <!--
+    Tedarik zinciri güvenliği: doğrudan ve dolaylı tüm paketler bilinen güvenlik açıklarına karşı taranır
+    (açık bulunursa Release derlemesi durur). Çözülen sürümler packages.lock.json dosyalarıyla kilitlenir;
+    CI ortamında (CI=true) kilit dosyasıyla uyuşmayan bir geri yükleme hata verir.
+  -->
+  <PropertyGroup>
+    <NuGetAudit>true</NuGetAudit>
+    <NuGetAuditMode>all</NuGetAuditMode>
+    <NuGetAuditLevel>low</NuGetAuditLevel>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RestoreLockedMode Condition="'$(CI)' == 'true'">true</RestoreLockedMode>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+</Project>

@@ -14,7 +14,7 @@ indent_size = 2
 trim_trailing_whitespace = false
 
 # Şablon dosyaları üretilen çözüme birebir kopyalanır; biçimlendirmeleri korunur.
-[src/NTierGenerator.Engine/Templates/**]
+[src/CleanArchitectureGenerator.Engine/Templates/**]
 trim_trailing_whitespace = false
 
 [*.cs]
